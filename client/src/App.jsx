@@ -33,7 +33,7 @@ function PortfolioPage() {
       <Skills />
       <Projects />
       <Services />
-      <Testimonials />
+      {/* <Testimonials /> */}
       <Contact />
       <Footer />
     </div>
