@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useScrollReveal, useStaggerReveal } from '../hooks/useScrollReveal';
-import API from '../utils/api';
+import { getCachedPublicData, getPublicData } from '../utils/api';
 
 const THEME = {
   indigo:  { grad: 'from-indigo-600/20 via-violet-600/10 to-transparent', border: 'border-indigo-500/25',  tag: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20',  blob: 'bg-indigo-500/10 group-hover:bg-indigo-500/20'  },
@@ -16,12 +16,17 @@ const THEME = {
 export default function Services() {
   const titleRef = useScrollReveal('reveal', 0);
   const gridRef  = useStaggerReveal('.stagger-item', 0.08);
-  const [services, setServices] = useState([]);
-  const [loading,  setLoading]  = useState(true);
+  const [services, setServices] = useState(() => getCachedPublicData('/services') || []);
+  const [loading,  setLoading]  = useState(() => !getCachedPublicData('/services'));
 
   useEffect(() => {
-    API.get('/services')
-      .then(({ data }) => setServices(data))
+    getPublicData('/services', {
+      onCached: (data) => {
+        setServices(data);
+        setLoading(false);
+      },
+      onFresh: setServices,
+    })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

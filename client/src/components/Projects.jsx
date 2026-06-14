@@ -11,7 +11,7 @@ import {
 } from "react-icons/fi";
 import { HiBadgeCheck } from "react-icons/hi";
 import { useScrollReveal } from "../hooks/useScrollReveal";
-import API from "../utils/api";
+import { getCachedPublicData, getPublicData } from "../utils/api";
 
 const FILTERS = ["All", "Web App", "Mobile", "API", "UI/UX", "Other"];
 
@@ -124,22 +124,33 @@ function ProjectCard({ project }) {
 export default function Projects() {
   const titleRef = useScrollReveal("reveal", 0);
 
-  const [projects, setProjects] = useState([]);
-  const [filtered, setFiltered] = useState([]);
+  const [projects, setProjects] = useState(() => getCachedPublicData("/projects") || []);
+  const [filtered, setFiltered] = useState(() => getCachedPublicData("/projects") || []);
   const [activeFilter, setFilter] = useState("All");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !getCachedPublicData("/projects"));
   const [error, setError] = useState("");
   const [page, setPage] = useState(0);
 
   const fetchProjects = useCallback(async () => {
-    setLoading(true);
+    const cachedProjects = getCachedPublicData("/projects");
+    if (!cachedProjects) setLoading(true);
     setError("");
     try {
-      const { data } = await API.get("/projects");
-      setProjects(data);
-      setFiltered(data);
+      await getPublicData("/projects", {
+        onCached: (data) => {
+          setProjects(data);
+          setFiltered(data);
+          setLoading(false);
+        },
+        onFresh: (data) => {
+          setProjects(data);
+          setFiltered(data);
+        },
+      });
     } catch (err) {
-      setError("Could not load projects. Is the server running?");
+      if (!cachedProjects) {
+        setError("Could not load projects. Is the server running?");
+      }
     } finally {
       setLoading(false);
     }

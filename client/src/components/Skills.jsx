@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useScrollReveal, useStaggerReveal } from '../hooks/useScrollReveal';
-import API from '../utils/api';
+import { getCachedPublicData, getPublicData } from '../utils/api';
 
 const THEME = {
   indigo:  { grad: 'from-indigo-500 to-blue-500',    badge: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/25',   bar: 'bg-gradient-to-r from-indigo-500 to-blue-400',    border: 'border-indigo-500/20',  glow: 'shadow-indigo-500/20'   },
@@ -54,13 +54,18 @@ export default function Skills() {
   const titleRef   = useScrollReveal('reveal', 0);
   const gridRef    = useStaggerReveal('.stagger-item', 0.12);
   const [visible,  setVisible]  = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [loading,  setLoading]  = useState(true);
+  const [categories, setCategories] = useState(() => getCachedPublicData('/skills') || []);
+  const [loading,  setLoading]  = useState(() => !getCachedPublicData('/skills'));
   const sectionRef = useRef(null);
 
   useEffect(() => {
-    API.get('/skills')
-      .then(({ data }) => setCategories(data))
+    getPublicData('/skills', {
+      onCached: (data) => {
+        setCategories(data);
+        setLoading(false);
+      },
+      onFresh: setCategories,
+    })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

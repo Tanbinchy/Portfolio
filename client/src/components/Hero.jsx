@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { FiArrowDown, FiGithub, FiLinkedin, FiTwitter } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi";
-import API from "../utils/api";
+import { getCachedPublicData, getPublicData } from "../utils/api";
 
 const roles = [
   "Full Stack Developer",
@@ -12,14 +12,16 @@ const roles = [
 ];
 
 export default function Hero() {
-  const [about, setAbout] = useState(null);
+  const [about, setAbout] = useState(() => getCachedPublicData("/about"));
   const [roleIndex, setRoleIndex] = useState(0);
   const [displayed, setDisplayed] = useState("");
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    API.get("/about")
-      .then(({ data }) => setAbout(data))
+    getPublicData("/about", {
+      onCached: setAbout,
+      onFresh: setAbout,
+    })
       .catch(() => {});
   }, []);
 

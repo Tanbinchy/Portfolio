@@ -2,18 +2,23 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { HiStar } from 'react-icons/hi';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import API from '../utils/api';
+import { getCachedPublicData, getPublicData } from '../utils/api';
 
 export default function Testimonials() {
   const titleRef = useScrollReveal('reveal', 0);
-  const [testimonials, setTestimonials] = useState([]);
-  const [loading,   setLoading]   = useState(true);
+  const [testimonials, setTestimonials] = useState(() => getCachedPublicData('/testimonials') || []);
+  const [loading,   setLoading]   = useState(() => !getCachedPublicData('/testimonials'));
   const [current,   setCurrent]   = useState(0);
   const [animating, setAnimating] = useState(false);
 
   useEffect(() => {
-    API.get('/testimonials')
-      .then(({ data }) => setTestimonials(data))
+    getPublicData('/testimonials', {
+      onCached: (data) => {
+        setTestimonials(data);
+        setLoading(false);
+      },
+      onFresh: setTestimonials,
+    })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

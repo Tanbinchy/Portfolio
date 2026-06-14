@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FiAward, FiBriefcase, FiUsers, FiCode } from "react-icons/fi";
 import { HiDownload } from "react-icons/hi";
 import { useScrollReveal, useStaggerReveal } from "../hooks/useScrollReveal";
-import API from "../utils/api";
+import { getCachedPublicData, getPublicData } from "../utils/api";
 
 const statIconMap = [FiAward, FiBriefcase, FiUsers, FiCode];
 const statColorMap = ["indigo", "violet", "cyan", "emerald"];
@@ -24,20 +24,29 @@ export default function About() {
   const statsRef = useStaggerReveal(".stagger-item", 0.1);
   const badgesRef = useScrollReveal("reveal", 0.25);
 
-  const [about, setAbout] = useState(null);
-  const [stats, setStats] = useState([]);
-  const [projectsCount, setProjectsCount] = useState(null);
+  const [about, setAbout] = useState(() => getCachedPublicData("/about"));
+  const [stats, setStats] = useState(() => getCachedPublicData("/stats") || []);
+  const [projectsCount, setProjectsCount] = useState(() => {
+    const cachedProjects = getCachedPublicData("/projects");
+    return Array.isArray(cachedProjects) ? cachedProjects.length : null;
+  });
 
   useEffect(() => {
-    API.get("/about")
-      .then(({ data }) => setAbout(data))
+    getPublicData("/about", {
+      onCached: setAbout,
+      onFresh: setAbout,
+    })
       .catch(() => {});
-    API.get("/stats")
-      .then(({ data }) => setStats(data))
+    getPublicData("/stats", {
+      onCached: setStats,
+      onFresh: setStats,
+    })
       .catch(() => {});
     // Pull real project count directly from the projects collection
-    API.get("/projects")
-      .then(({ data }) => setProjectsCount(data.length))
+    getPublicData("/projects", {
+      onCached: (data) => setProjectsCount(data.length),
+      onFresh: (data) => setProjectsCount(data.length),
+    })
       .catch(() => {});
   }, []);
 
