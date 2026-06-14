@@ -18,12 +18,12 @@ A modern, dynamic portfolio website built with **React**, **Tailwind CSS**, **No
 - **Contact Form** — Validation, glassmorphic inputs, saves to MongoDB, success/error alerts
 - **Footer** — Multi-column layout, social links, animated heart, back-to-top
 
-### Admin Dashboard (`/admin`)
+### Admin Dashboard
 
-- 🔐 JWT authentication (email + password via `.env`)
+- 🔐 JWT authentication
 - 📊 Stats overview (total projects, featured, categories, unread messages)
 - 📋 Project table with Create / Edit / Delete actions
-- 🌱 One-click seed sample data (6 demo projects)
+- 🌱 One-click seed sample data
 - ✉️ View and manage contact form submissions
 - ✅ Mark messages as read / delete
 
@@ -33,38 +33,18 @@ A modern, dynamic portfolio website built with **React**, **Tailwind CSS**, **No
 
 ```
 portfolio/
-├── package.json          ← root (concurrently)
+├── package.json
 ├── server/
-│   ├── .env              ← ⚠️  update before production
 │   ├── server.js
 │   ├── models/
-│   │   ├── Project.js
-│   │   └── Contact.js
 │   ├── routes/
-│   │   ├── auth.js
-│   │   ├── projects.js
-│   │   └── contact.js
 │   └── middleware/
-│       └── auth.js
 └── client/
     ├── tailwind.config.js
     └── src/
         ├── App.jsx
         ├── components/
-        │   ├── Navbar.jsx
-        │   ├── Hero.jsx
-        │   ├── About.jsx
-        │   ├── Skills.jsx
-        │   ├── Projects.jsx      ← fetches from MongoDB
-        │   ├── Services.jsx
-        │   ├── Testimonials.jsx
-        │   ├── Contact.jsx
-        │   └── Footer.jsx
         └── admin/
-            ├── AdminLogin.jsx
-            ├── AdminDashboard.jsx
-            ├── ProjectForm.jsx
-            └── ProtectedRoute.jsx
 ```
 
 ---
@@ -74,7 +54,7 @@ portfolio/
 ### Prerequisites
 
 - Node.js 16+ and npm
-- A MongoDB Atlas account (already configured ✅)
+- A MongoDB Atlas account
 
 ### 1. Install all dependencies
 
@@ -85,7 +65,21 @@ npm run install-all
 
 This runs `npm install` in root, `server/`, and `client/`.
 
-### 2. Start the development servers
+### 2. Configure environment variables
+
+Copy `.env.example` to `server/.env` and fill in your own values:
+
+```
+PORT
+MONGODB_URI
+JWT_SECRET
+ADMIN_EMAIL
+ADMIN_PASSWORD
+```
+
+> ⚠️ Never commit your `.env` file to version control.
+
+### 3. Start the development servers
 
 ```bash
 # From the root portfolio/ folder
@@ -97,30 +91,13 @@ This starts:
 - 🟢 **Backend** at `http://localhost:5000`
 - 🔵 **Frontend** at `http://localhost:3000`
 
-### 3. Open your browser
+### 4. Seed sample projects
 
-| URL                                 | Description       |
-| ----------------------------------- | ----------------- |
-| `http://localhost:3000`             | Portfolio website |
-| `http://localhost:3000/admin/login` | Admin panel       |
-
-### 5. Seed sample projects
-
-In the Admin Dashboard → click **"Seed Sample Data"** button to populate 6 demo projects.
+Log into the Admin Dashboard and click **"Seed Sample Data"** to populate demo projects.
 
 ---
 
-## 🛠️ Configuration
-
-### `server/.env`
-
-```env
-PORT=5000
-MONGODB_URI=your_mongodb_atlas_uri_here
-JWT_SECRET=change_this_to_something_secure_in_production
-```
-
-### Customising your portfolio content
+## 🛠️ Customising Your Portfolio
 
 Edit these files to replace placeholder data with your own:
 
@@ -150,17 +127,16 @@ Edit these files to replace placeholder data with your own:
 
 ### Protected (requires JWT token)
 
-| Method | URL                         | Description               |
-| ------ | --------------------------- | ------------------------- |
-| POST   | `/api/auth/login`           | Admin login → returns JWT |
-| GET    | `/api/auth/verify`          | Verify token              |
-| POST   | `/api/projects`             | Create project            |
-| PUT    | `/api/projects/:id`         | Update project            |
-| DELETE | `/api/projects/:id`         | Delete project            |
-| POST   | `/api/projects/seed/sample` | Seed 6 demo projects      |
-| GET    | `/api/contact`              | View all contact messages |
-| PATCH  | `/api/contact/:id/read`     | Mark message as read      |
-| DELETE | `/api/contact/:id`          | Delete message            |
+| Method | URL                     | Description               |
+| ------ | ----------------------- | ------------------------- |
+| POST   | `/api/auth/login`       | Admin login → returns JWT |
+| GET    | `/api/auth/verify`      | Verify token              |
+| POST   | `/api/projects`         | Create project            |
+| PUT    | `/api/projects/:id`     | Update project            |
+| DELETE | `/api/projects/:id`     | Delete project            |
+| GET    | `/api/contact`          | View all contact messages |
+| PATCH  | `/api/contact/:id/read` | Mark message as read      |
+| DELETE | `/api/contact/:id`      | Delete message            |
 
 ---
 
@@ -177,11 +153,10 @@ cd client && npm run build
 
 ```bash
 cd server
-# Set environment variables in your host dashboard
-# Deploy server/ folder
+# Set all environment variables in your host's dashboard before deploying
 ```
 
-> ⚠️ **Remember:** Update `MONGODB_URI`, `JWT_SECRET`, `ADMIN_PASSWORD` and set `CORS` origins in `server.js` before deploying to production!
+> ⚠️ Always set your environment variables securely via your hosting provider's dashboard — never hardcode secrets in your codebase.
 
 ---
 
